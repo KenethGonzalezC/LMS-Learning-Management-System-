@@ -1,0 +1,66 @@
+﻿@model LMS.Models.ViewModels.ProfesorLoginViewModel
+
+@{
+    ViewData["Title"] = "Login Profesor";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+
+            <div class="card shadow-sm">
+                <div class="card-body">
+
+                    <h4 class="text-center mb-4">Ingreso Profesor</h4>
+
+                    @if (ViewBag.Error != null)
+                    {
+                        <div class="alert alert-danger text-center">
+                            @ViewBag.Error
+                        </div>
+                    }
+
+                    <form asp-action="ProfesorLogin" method="post">
+
+                        <div class="mb-3">
+                            <label asp-for="Nombre" class="form-label"></label>
+                            <input asp-for="Nombre" class="form-control" />
+                            <span asp-validation-for="Nombre" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Passwd" class="form-label">Contraseña</label>
+                            <input asp-for="Passwd" type="password" class="form-control" />
+                            <span asp-validation-for="Passwd" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="SedeId" class="form-label"></label>
+                            <select asp-for="SedeId"
+                                    asp-items="@(new SelectList(Model.Sedes, "Id", "Nombre"))"
+                                    class="form-select">
+                                <option value="">-- Seleccione una sede --</option>
+                            </select>
+                            <span asp-validation-for="SedeId" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                Ingresar
+                            </button>
+
+                            <a asp-controller="Home"
+                               asp-action="Index"
+                               class="btn btn-secondary">
+                                Volver
+                            </a>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

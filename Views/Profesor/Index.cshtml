@@ -1,0 +1,117 @@
+﻿@model List<LMS.Models.Entidades.Curso>
+
+@{
+    ViewData["Title"] = "Mis Cursos";
+}
+
+<div class="container mt-4">
+
+    <!-- Header y botones -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Mis Cursos</h2>
+
+        <div>
+            <a asp-controller="Home"
+               asp-action="Index"
+               class="btn btn-secondary btn-sm me-2">
+                Volver al Inicio
+            </a>
+
+            <button type="button"
+                    class="btn btn-success btn-sm"
+                    data-bs-toggle="modal"
+                    data-bs-target="#crearCursoModal">
+                ➕ Añadir Curso
+            </button>
+        </div>
+    </div>
+
+    <!-- Alertas -->
+    @if (TempData["Mensaje"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Mensaje"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+    }
+
+    <!-- Lista de cursos -->
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert alert-info">
+            No tienes cursos creados.
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var curso in Model)
+            {
+                <div class="col-md-4 mb-3">
+                    <div class="card shadow-sm h-100 d-flex flex-column">
+                        <div class="card-body flex-grow-1">
+                            <h5 class="card-title">@curso.Nombre</h5>
+                            <p class="card-text text-muted">@curso.Descripcion</p>
+                            <p class="mb-1"><strong>Estudiantes:</strong> @curso.EstudiantesCursos.Count</p>
+                            <p class="mb-1"><strong>Módulos:</strong> @curso.Modulos.Count</p>
+                        </div>
+                        <div class="card-footer d-flex justify-content-between align-items-center">
+                            <a asp-controller="Profesor"
+                               asp-action="Detalle"
+                               asp-route-id="@curso.CursoId"
+                               class="btn btn-primary btn-sm">
+                                Ver Curso
+                            </a>
+
+                            <form asp-controller="Profesor"
+                                  asp-action="Eliminar"
+                                  method="post"
+                                  onsubmit="return confirm('¿Seguro que quieres eliminar este curso y todo su contenido?');">
+                                <input type="hidden" name="cursoId" value="@curso.CursoId" />
+                                <button type="submit" class="btn btn-danger btn-sm">
+                                    Eliminar
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+</div>
+
+<!-- Modal Crear Curso -->
+<div class="modal fade" id="crearCursoModal" tabindex="-1" aria-labelledby="crearCursoLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form asp-controller="Profesor" asp-action="CrearCurso" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="crearCursoLabel">Crear Curso</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nombre del Curso</label>
+                        <input type="text" name="nombre" class="form-control" required autocomplete="off" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Descripción</label>
+                        <textarea name="descripcion" class="form-control" rows="3" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Crear Curso</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

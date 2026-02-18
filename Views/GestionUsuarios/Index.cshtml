@@ -1,0 +1,183 @@
+﻿@model Tuple<List<LMS.Models.Entidades.Profesor>, List<LMS.Models.Entidades.Estudiante>>
+
+@{
+    ViewData["Title"] = "Gestión de Usuarios";
+    var profesores = Model.Item1;
+    var alumnos = Model.Item2;
+}
+
+<div class="container mt-4">
+
+    <h2 class="mb-4">Gestión de Usuarios</h2>
+
+    <!-- ========================= -->
+    <!-- SEDE ACTUAL -->
+    <!-- ========================= -->
+    <div class="mb-3">
+        <h5>Sede actual: <strong>@ViewBag.SedeNombre</strong></h5>
+    </div>
+
+    <!-- ========================= -->
+    <!-- FILTRO DE SEDE -->
+    <!-- ========================= -->
+    <form method="get" asp-action="Index" class="row g-3 mb-4">
+        <div class="col-auto">
+            <select name="sedeFiltro" class="form-select">
+                @foreach (var sede in ViewBag.Sedes)
+                {
+                    <option value="@sede.Id" selected="@(sede.Id == ViewBag.SedeSeleccionada)">
+                        @sede.Nombre
+                    </option>
+                }
+            </select>
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">
+                Filtrar
+            </button>
+        </div>
+    </form>
+
+    <hr />
+
+    <!-- ========================= -->
+    <!-- CREAR PROFESOR -->
+    <!-- ========================= -->
+    <div class="card mb-4">
+        <div class="card-header">
+            Crear Profesor
+        </div>
+        <div class="card-body">
+            <form asp-action="CrearProfesor" method="post" class="row g-3">
+                <div class="col-md-4">
+                    <input type="text"
+                           name="profesorNombre"
+                           class="form-control"
+                           placeholder="Nombre"
+                           autocomplete="off"
+                           required />
+                </div>
+                <div class="col-md-4">
+                    <input type="password"
+                           name="profesorPasswd"
+                           class="form-control"
+                           placeholder="Contraseña"
+                           autocomplete="new-password"
+                           required />
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-success w-100">
+                        Crear
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ========================= -->
+    <!-- CREAR ALUMNO -->
+    <!-- ========================= -->
+    <div class="card mb-4">
+        <div class="card-header">
+            Crear Alumno
+        </div>
+        <div class="card-body">
+            <form asp-action="CrearAlumno" method="post" class="row g-3">
+                <div class="col-md-3">
+                    <input type="text" name="cedula" class="form-control" placeholder="Cédula" required />
+                </div>
+                <div class="col-md-4">
+                    <input type="text" name="nombre" class="form-control" placeholder="Nombre" required />
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-success w-100">
+                        Crear
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <hr />
+
+    <!-- ========================= -->
+    <!-- LISTA PROFESORES -->
+    <!-- ========================= -->
+    <h4>Profesores</h4>
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th style="width:150px;">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (profesores.Any())
+            {
+                foreach (var profesor in profesores)
+                {
+                    <tr>
+                        <td>@profesor.Nombre</td>
+                        <td>
+                            <a asp-action="EliminarProfesor"
+                               asp-route-id="@profesor.Id"
+                               class="btn btn-danger btn-sm"
+                               onclick="return confirm('¿Eliminar este profesor?');">
+                                Eliminar
+                            </a>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="2" class="text-center">No hay profesores registrados.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <hr />
+
+    <!-- ========================= -->
+    <!-- LISTA ALUMNOS -->
+    <!-- ========================= -->
+    <h4>Alumnos</h4>
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Cédula</th>
+                <th>Nombre</th>
+                <th style="width:150px;">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (alumnos.Any())
+            {
+                foreach (var alumno in alumnos)
+                {
+                    <tr>
+                        <td>@alumno.Cedula</td>
+                        <td>@alumno.Nombre</td>
+                        <td>
+                            <a asp-action="EliminarAlumno"
+                               asp-route-cedula="@alumno.Cedula"
+                               class="btn btn-danger btn-sm"
+                               onclick="return confirm('¿Eliminar este alumno?');">
+                                Eliminar
+                            </a>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="3" class="text-center">No hay alumnos registrados.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+</div>

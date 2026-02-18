@@ -1,0 +1,50 @@
+﻿@model LMS.Models.ViewModels.EstudianteLoginViewModel
+
+@{
+    ViewData["Title"] = "Login Estudiante";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+
+            <div class="card shadow-sm">
+                <div class="card-body">
+
+                    <h4 class="text-center mb-4">Ingreso Estudiante</h4>
+
+                    @if (ViewBag.Error != null)
+                    {
+                        <div class="alert alert-danger text-center">
+                            @ViewBag.Error
+                        </div>
+                    }
+
+                    <form asp-action="EstudianteLogin" method="post">
+
+                        <div class="mb-3">
+                            <label asp-for="Cedula" class="form-label"></label>
+                            <input asp-for="Cedula" class="form-control" />
+                            <span asp-validation-for="Cedula" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success">
+                                Ingresar
+                            </button>
+
+                            <a asp-controller="Home"
+                               asp-action="Index"
+                               class="btn btn-secondary">
+                                Volver
+                            </a>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
