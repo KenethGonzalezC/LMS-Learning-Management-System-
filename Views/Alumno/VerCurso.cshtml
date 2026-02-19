@@ -1,0 +1,87 @@
+﻿@model LMS.Models.Entidades.Curso
+@{
+    Layout = "~/Views/Shared/_LayoutAlumno.cshtml";
+}
+@{
+    var puntajes = ViewBag.Puntajes as List<LMS.Models.Entidades.EstudianteModulo>;
+}
+
+<h2>@Model.Nombre</h2>
+<p>@Model.Descripcion</p>
+
+<hr />
+
+@foreach (var modulo in Model.Modulos.OrderBy(m => m.Orden))
+{
+    var registro = puntajes?.FirstOrDefault(p => p.ModuloId == modulo.ModuloId);
+
+    bool aprobado = registro != null && registro.Puntaje >= modulo.NotaMinima;
+    bool disponible = false;
+
+    var modulosOrdenados = Model.Modulos.OrderBy(m => m.Orden).ToList();
+    var index = modulosOrdenados.FindIndex(m => m.ModuloId == modulo.ModuloId);
+
+    if (index == 0)
+    {
+        disponible = true;
+    }
+    else
+    {
+        var anterior = modulosOrdenados[index - 1];
+        var regAnterior = puntajes?.FirstOrDefault(p => p.ModuloId == anterior.ModuloId);
+
+        if (regAnterior != null && regAnterior.Puntaje >= anterior.NotaMinima)
+        {
+            disponible = true;
+        }
+    }
+
+    <div class="card mb-3">
+        <div class="card-body d-flex justify-content-between align-items-center">
+
+            <div>
+                <strong>Módulo @modulo.Orden:</strong> @modulo.Titulo
+                <br />
+
+                @if (registro != null)
+                {
+                    <small class="text-muted">
+                        Puntaje actual: <strong>@registro.Puntaje%</strong>
+                    </small>
+                    <br />
+                }
+
+                @if (aprobado)
+                {
+                    <span class="text-success">✅ Aprobado</span>
+                }
+                else if (disponible)
+                {
+                    <span class="text-primary">🟢 Disponible</span>
+                }
+                else
+                {
+                    <span class="text-danger">🔒 Bloqueado</span>
+                }
+            </div>
+
+            <div>
+                @if (disponible)
+                {
+                    <a asp-action="VerModulo"
+                       asp-route-moduloId="@modulo.ModuloId"
+                       class="btn btn-primary">
+                        Entrar
+                    </a>
+                }
+                else
+                {
+                    <button class="btn btn-secondary" disabled>
+                        Bloqueado
+                    </button>
+                }
+            </div>
+
+        </div>
+    </div>
+}

@@ -1,0 +1,89 @@
+﻿@model LMS.Models.Entidades.Modulo
+@{
+    Layout = "~/Views/Shared/_LayoutAlumno.cshtml";
+}
+@{
+    var registro = ViewBag.Puntaje as LMS.Models.Entidades.EstudianteModulo;
+}
+
+<h2>@Model.Titulo</h2>
+<p>@Model.Descripcion</p>
+
+@if (!string.IsNullOrEmpty(Model.VideoPath))
+{
+    <video width="700" controls class="mb-3">
+        <source src="@Model.VideoPath" type="video/mp4" />
+    </video>
+}
+
+<hr />
+
+<!-- ================= PUNTAJE ================= -->
+@if (registro != null)
+{
+    <div class="alert @(registro.Puntaje >= Model.NotaMinima ? "alert-success" : "alert-warning")">
+        <strong>Tu mejor puntaje:</strong> @registro.Puntaje%
+
+        @if (registro.Puntaje >= Model.NotaMinima)
+        {
+            <span> - ✅ Aprobado</span>
+        }
+        else
+        {
+            <span> - ❌ No aprobado</span>
+        }
+    </div>
+
+    <!-- Barra de progreso -->
+    <div class="progress mb-4" style="height:25px;">
+        <div class="progress-bar"
+             role="progressbar"
+             style="width:@registro.Puntaje%">
+            @registro.Puntaje%
+        </div>
+    </div>
+}
+else
+{
+    <div class="alert alert-secondary">
+        Aún no has realizado este módulo.
+    </div>
+}
+
+<hr />
+
+<!-- ================= FORMULARIO ================= -->
+
+<form asp-action="Resolver" method="post">
+    <input type="hidden" name="moduloId" value="@Model.ModuloId" />
+
+    @foreach (var pregunta in Model.Preguntas)
+    {
+        <div class="card mb-3">
+            <div class="card-body">
+                <p><strong>@pregunta.Enunciado</strong></p>
+
+                <div>
+                    <input type="radio" name="respuestas[@pregunta.PreguntaId]" value="A" required />
+                    @pregunta.OpcionA
+                </div>
+                <div>
+                    <input type="radio" name="respuestas[@pregunta.PreguntaId]" value="B" />
+                    @pregunta.OpcionB
+                </div>
+                <div>
+                    <input type="radio" name="respuestas[@pregunta.PreguntaId]" value="C" />
+                    @pregunta.OpcionC
+                </div>
+                <div>
+                    <input type="radio" name="respuestas[@pregunta.PreguntaId]" value="D" />
+                    @pregunta.OpcionD
+                </div>
+            </div>
+        </div>
+    }
+
+    <button type="submit" class="btn btn-success">
+        Enviar respuestas
+    </button>
+</form>

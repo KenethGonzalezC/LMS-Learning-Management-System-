@@ -1,0 +1,181 @@
+﻿@model LMS.Models.Entidades.Curso
+
+@{
+    ViewData["Title"] = "Detalle del Curso";
+}
+
+<div class="container mt-4">
+
+    <!-- ===================== HEADER ===================== -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">@Model.Nombre</h2>
+
+        <div>
+            <!-- Volver a Mis Cursos -->
+            <a asp-controller="Profesor"
+               asp-action="Index"
+               class="btn btn-secondary btn-sm me-2">
+                ← Volver a Mis Cursos
+            </a>
+
+            <!-- Añadir Módulo → Redirige a ModuloController/CrearModulo -->
+            <a asp-controller="Modulo"
+               asp-action="CrearModulo"
+               asp-route-cursoId="@Model.CursoId"
+               class="btn btn-success btn-sm">
+                ➕ Añadir Módulo
+            </a>
+        </div>
+    </div>
+
+    <!-- ===================== INFORMACIÓN DEL CURSO ===================== -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <p class="mb-1"><strong>Descripción:</strong> @Model.Descripcion</p>
+            <p class="mb-1"><strong>Estudiantes inscritos:</strong> @Model.EstudiantesCursos.Count</p>
+            <p class="mb-0"><strong>Módulos creados:</strong> @Model.Modulos.Count</p>
+        </div>
+    </div>
+
+    <!-- ===================== ALERTAS ===================== -->
+    @if (TempData["Mensaje"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Mensaje"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- ===================== MÓDULOS ===================== -->
+    <h4 class="mt-4 mb-3">Módulos</h4>
+
+    @if (!Model.Modulos.Any())
+    {
+        <div class="alert alert-info">
+            No hay módulos creados.
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var modulo in Model.Modulos.OrderBy(m => m.Orden))
+            {
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100 shadow-sm d-flex flex-column">
+                        <div class="card-body flex-grow-1">
+                            <h5 class="card-title">@modulo.Titulo</h5>
+                            <p class="card-text">@modulo.Descripcion</p>
+                            <p class="mb-1"><strong>Preguntas:</strong> @modulo.Preguntas.Count</p>
+                            <p class="mb-0"><strong>Nota mínima:</strong> @modulo.NotaMinima</p>
+                        </div>
+                        <div class="card-footer d-flex justify-content-between">
+                            <!-- Ver Módulo → Preview completo -->
+                            <a asp-controller="Modulo"
+                               asp-action="Preview"
+                               asp-route-id="@modulo.ModuloId"
+                               class="btn btn-primary btn-sm">
+                                Ver Módulo
+                            </a>
+
+                            <!-- Editar Módulo → ModuloController -->
+                            <a asp-controller="Modulo"
+                               asp-action="Editar"
+                               asp-route-id="@modulo.ModuloId"
+                               class="btn btn-warning btn-sm">
+                                Editar
+                            </a>
+
+                            <!-- Eliminar Módulo → ModuloController -->
+                            <form asp-controller="Modulo"
+                                  asp-action="EliminarModulo"
+                                  method="post"
+                                  onsubmit="return confirm('¿Seguro que deseas eliminar este módulo y todas sus preguntas?');">
+                                <input type="hidden" name="moduloId" value="@modulo.ModuloId" />
+                                <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    <!-- ===================== ESTUDIANTES ===================== -->
+    <h4 class="mt-5 mb-3">Estudiantes</h4>
+
+    <button type="button" class="btn btn-success btn-sm mb-3" data-bs-toggle="modal" data-bs-target="#agregarEstudianteModal">
+        ➕ Agregar Estudiante
+    </button>
+
+    @if (!Model.EstudiantesCursos.Any())
+    {
+        <div class="alert alert-info">
+            No hay estudiantes inscritos.
+        </div>
+    }
+    else
+    {
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Cédula</th>
+                    <th>Nombre</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var est in Model.EstudiantesCursos)
+                {
+                    <tr>
+                        <td>@est.Estudiante.Cedula</td>
+                        <td>@est.Estudiante.Nombre</td>
+                        <td>
+                            <form asp-controller="Profesor"
+                                  asp-action="QuitarEstudiante"
+                                  method="post"
+                                  onsubmit="return confirm('¿Deseas quitar a este estudiante del curso?');"
+                                  class="d-inline">
+                                <input type="hidden" name="cursoId" value="@Model.CursoId" />
+                                <input type="hidden" name="cedula" value="@est.Estudiante.Cedula" />
+                                <button type="submit" class="btn btn-danger btn-sm">Quitar</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+</div>
+
+<!-- ===================== MODAL AGREGAR ESTUDIANTE ===================== -->
+<div class="modal fade" id="agregarEstudianteModal" tabindex="-1" aria-labelledby="agregarEstudianteLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form asp-controller="Profesor" asp-action="AgregarEstudiante" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="agregarEstudianteLabel">Agregar Estudiante</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="cursoId" value="@Model.CursoId" />
+                    <div class="mb-3">
+                        <label class="form-label">Cédula del Estudiante</label>
+                        <input type="text" name="cedula" class="form-control" required />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Agregar</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

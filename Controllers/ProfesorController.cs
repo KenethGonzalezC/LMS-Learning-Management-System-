@@ -81,14 +81,12 @@ namespace LMS.Controllers
             int profesorId = HttpContext.Session.GetInt32("ProfesorId")!.Value;
             int sedeId = HttpContext.Session.GetInt32("SedeId")!.Value;
 
-            var curso = await _context.Cursos
+            var curso = _context.Cursos
                 .Include(c => c.Modulos)
+                    .ThenInclude(m => m.Preguntas) // para que modulo.Preguntas no sea null
                 .Include(c => c.EstudiantesCursos)
                     .ThenInclude(ec => ec.Estudiante)
-                .FirstOrDefaultAsync(c =>
-                    c.CursoId == id &&
-                    c.ProfesorId == profesorId &&
-                    c.SedeId == sedeId);
+                .FirstOrDefault(c => c.CursoId == id && c.ProfesorId == profesorId);
 
             if (curso == null)
                 return RedirectToAction("Index");
@@ -152,6 +150,75 @@ namespace LMS.Controllers
             TempData["Mensaje"] = $"Curso '{curso.Nombre}' eliminado correctamente.";
 
             return RedirectToAction("Index");
+        }
+
+        // ===============================
+        // AGREGAR ESTUDIANTE
+        // ===============================
+        [HttpPost]
+        public async Task<IActionResult> AgregarEstudiante(int cursoId, string cedula)
+        {
+            if (!SesionValida())
+                return RedirectToAction("ProfesorLogin", "Auth");
+
+            int profesorId = HttpContext.Session.GetInt32("ProfesorId")!.Value;
+            int sedeId = HttpContext.Session.GetInt32("SedeId")!.Value;
+
+            var curso = await _context.Cursos
+                .Include(c => c.EstudiantesCursos)
+                .FirstOrDefaultAsync(c => c.CursoId == cursoId && c.ProfesorId == profesorId && c.SedeId == sedeId);
+
+            if (curso == null)
+            {
+                TempData["Error"] = "Curso no encontrado.";
+                return RedirectToAction("Index");
+            }
+
+            var estudiante = await _context.Estudiantes
+                .FirstOrDefaultAsync(e => e.Cedula == cedula && e.SedeId == sedeId);
+
+            if (estudiante == null)
+            {
+                TempData["Error"] = "Estudiante no existe en esta sede.";
+                return RedirectToAction("Detalle", new { id = cursoId });
+            }
+
+            if (!curso.EstudiantesCursos.Any(ec => ec.EstudianteCedula == cedula))
+            {
+                var relacion = new EstudianteCurso
+                {
+                    CursoId = cursoId,
+                    EstudianteCedula = cedula
+                };
+
+                _context.EstudiantesCursos.Add(relacion);
+                await _context.SaveChangesAsync();
+                TempData["Mensaje"] = $"Estudiante '{estudiante.Nombre}' agregado al curso.";
+            }
+
+            return RedirectToAction("Detalle", new { id = cursoId });
+        }
+
+        // ===============================
+        // QUITAR ESTUDIANTE
+        // ===============================
+        [HttpPost]
+        public async Task<IActionResult> QuitarEstudiante(int cursoId, string cedula)
+        {
+            if (!SesionValida())
+                return RedirectToAction("ProfesorLogin", "Auth");
+
+            var relacion = await _context.EstudiantesCursos
+                .FirstOrDefaultAsync(ec => ec.CursoId == cursoId && ec.EstudianteCedula == cedula);
+
+            if (relacion != null)
+            {
+                _context.EstudiantesCursos.Remove(relacion);
+                await _context.SaveChangesAsync();
+                TempData["Mensaje"] = $"Estudiante eliminado del curso.";
+            }
+
+            return RedirectToAction("Detalle", new { id = cursoId });
         }
     }
 }

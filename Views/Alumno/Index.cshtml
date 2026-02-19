@@ -1,6 +1,42 @@
-﻿@page
-@model LMS.Views.Alumno.IndexModel
+﻿@model List<LMS.Models.Entidades.Curso>
+
 @{
+    Layout = "~/Views/Shared/_LayoutAlumno.cshtml";
 }
 
-<h5>Alumno</h5>
+@{
+    ViewData["Title"] = "Mis Cursos";
+}
+
+<div class="container mt-4">
+    <h2>Mis Cursos</h2>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-warning">
+            No perteneces a ningún curso actualmente.
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var curso in Model)
+            {
+                <div class="col-md-4 mb-3">
+                    <a asp-controller="Alumno"
+                       asp-action="VerCurso"
+                       asp-route-cursoId="@curso.CursoId"
+                       class="text-decoration-none">
+
+                        <div class="card shadow-sm h-100 btn btn-outline-primary d-flex align-items-center justify-content-center p-4">
+                            <h5 class="card-title text-center mb-0">
+                                @curso.Nombre
+                            </h5>
+                        </div>
+
+                    </a>
+                </div>
+            }
+        </div>
+    }
+</div>

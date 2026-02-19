@@ -13,33 +13,12 @@ namespace LMS.Controllers
         {
             _context = context;
         }
-
-        // ===============================
-        // VALIDACIÓN
-        // ===============================
-        private bool SesionValida()
-        {
-            return HttpContext.Session.GetInt32("ProfesorId") != null
-                && HttpContext.Session.GetInt32("SedeId") != null;
-        }
-
         // ===============================
         // INDEX - MIS CURSOS
         // ===============================
         public async Task<IActionResult> Index()
         {
-            if (!SesionValida())
-                return RedirectToAction("ProfesorLogin", "Auth");
-
-            int profesorId = HttpContext.Session.GetInt32("ProfesorId")!.Value;
-
-            var cursos = await _context.Cursos
-                .Where(c => c.ProfesorId == profesorId)
-                .Include(c => c.Modulos)
-                .Include(c => c.EstudiantesCursos)
-                .ToListAsync();
-
-            return View(cursos);
+            return View();
         }
     }
 }

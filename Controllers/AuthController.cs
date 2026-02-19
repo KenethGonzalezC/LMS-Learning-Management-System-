@@ -100,7 +100,9 @@ namespace LMS.Controllers
             }
 
             HttpContext.Session.SetString("UsuarioCedula", estudiante.Cedula);
+            HttpContext.Session.SetString("UsuarioNombre", estudiante.Nombre);
             HttpContext.Session.SetString("UsuarioTipo", "Estudiante");
+            HttpContext.Session.SetString("SedeNombre", estudiante.Sede?.Nombre ?? "");
 
             return RedirectToAction("Index", "Alumno");
         }

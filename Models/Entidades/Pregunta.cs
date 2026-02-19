@@ -12,6 +12,8 @@
         public string OpcionD { get; set; }
         public string RespuestaCorrecta { get; set; }
 
+        public int ProfesorId { get; set; }
+        public Profesor Profesor { get; set; } = null!;
         public int ModuloId { get; set; }
         public Modulo Modulo { get; set; }
     }

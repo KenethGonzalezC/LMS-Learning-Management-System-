@@ -1,0 +1,57 @@
+﻿@using LMS.Models.Entidades
+@model LMS.Models.Entidades.Modulo
+
+@{
+    ViewData["Title"] = "Vista previa del módulo";
+}
+
+<div class="d-flex justify-content-start gap-2 mt-3">
+    <!-- Volver al curso -->
+    <a asp-controller="Profesor"
+       asp-action="Detalle"
+       asp-route-id="@Model.CursoId"
+       class="btn btn-secondary">
+        Volver al curso
+    </a>
+
+    <!-- Editar Módulo -->
+    <a asp-controller="Modulo"
+       asp-action="Editar"
+       asp-route-id="@Model.ModuloId"
+       class="btn btn-warning btn-sm">
+        Editar
+    </a>
+</div>
+
+<div class="container mt-4">
+    <h3>@Model.Titulo</h3>
+    <p>@Model.Descripcion</p>
+
+    <h5>Contenido de texto:</h5>
+    <p>@Model.ContenidoTexto</p>
+
+    @if (!string.IsNullOrEmpty(Model.VideoPath))
+    {
+        <video width="100%" controls>
+            <source src="@Model.VideoPath" type="video/mp4">
+            Tu navegador no soporta la reproducción de video.
+        </video>
+    }
+
+    <p><strong>Nota mínima para aprobar:</strong> @Model.NotaMinima</p>
+
+    <h5>Preguntas:</h5>
+    @if (Model.Preguntas.Any())
+    {
+        <ol>
+            @foreach (var p in Model.Preguntas)
+            {
+                <li>@p.Enunciado</li>
+            }
+        </ol>
+    }
+    else
+    {
+        <p>No se han agregado preguntas aún.</p>
+    }
+</div>

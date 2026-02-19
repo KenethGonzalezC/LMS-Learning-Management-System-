@@ -23,18 +23,19 @@ namespace LMS.Data
                 context.SaveChanges();
             }
 
-            // Obtener primera sede
-            var sedePrincipal = context.Sedes.First();
+            // Obtener todas las sedes
+            var sedes = context.Sedes.ToList();
 
-            // Crear profesor administrador
-            context.Profesores.Add(
-                new Profesor
+            // Crear un profesor por cada sede
+            foreach (var sede in sedes)
+            {
+                context.Profesores.Add(new Profesor
                 {
-                    Nombre = "Admin",
+                    Nombre = $"Profesor {sede.Nombre}",
                     Passwd = "1234",
-                    SedeId = sedePrincipal.Id
-                }
-            );
+                    SedeId = sede.Id
+                });
+            }
 
             context.SaveChanges();
         }

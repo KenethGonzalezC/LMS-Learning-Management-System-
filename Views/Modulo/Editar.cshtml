@@ -1,0 +1,164 @@
+﻿@model LMS.Models.Entidades.Modulo
+
+@{
+    ViewData["Title"] = "Editar Módulo";
+}
+
+<div class="container mt-4">
+
+    <h3>Editar Módulo: @Model.Titulo</h3>
+
+    @if (TempData["Mensaje"] != null)
+    {
+        <div class="alert alert-success">@TempData["Mensaje"]</div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <!-- =========================
+         FORMULARIO EDITAR MÓDULO
+         ========================= -->
+    <form asp-action="Editar" method="post" enctype="multipart/form-data" class="mb-4">
+        <input type="hidden" name="ModuloId" value="@Model.ModuloId" />
+
+        <div class="mb-3">
+            <label class="form-label">Título</label>
+            <input name="Titulo" value="@Model.Titulo" class="form-control" required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Descripción</label>
+            <textarea name="Descripcion" class="form-control">@Model.Descripcion</textarea>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Contenido de texto</label>
+            <textarea name="ContenidoTexto" class="form-control">@Model.ContenidoTexto</textarea>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Video (opcional)</label>
+            <input type="file" name="video" class="form-control" />
+            @if (!string.IsNullOrEmpty(Model.VideoPath))
+            {
+                <small>Video actual: <a href="@Model.VideoPath" target="_blank">Ver</a></small>
+            }
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Cantidad de preguntas</label>
+            <input type="number" name="CantidadPreguntas" value="@Model.CantidadPreguntas" class="form-control" min="3" max="10" required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Nota mínima</label>
+            <input type="number" name="NotaMinima" value="@Model.NotaMinima" class="form-control" step="0.01" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Orden</label>
+            <input type="number" name="Orden" value="@Model.Orden" class="form-control" />
+        </div>
+
+        <button type="submit" class="btn btn-success">Actualizar módulo</button>
+        <a asp-action="Preview" asp-route-id="@Model.ModuloId" class="btn btn-primary ms-2">Ver Preview</a>
+        <form asp-action="EliminarModulo" method="post" class="d-inline ms-2" onsubmit="return confirm('¿Seguro que deseas eliminar este módulo y todas sus preguntas?');">
+            <input type="hidden" name="moduloId" value="@Model.ModuloId" />
+            <button type="submit" class="btn btn-danger">Eliminar</button>
+        </form>
+    </form>
+
+    <hr />
+
+    <!-- =========================
+         PREGUNTAS EXISTENTES EDITABLES
+         ========================= -->
+    <h4>Preguntas existentes</h4>
+
+    @if (Model.Preguntas != null && Model.Preguntas.Any())
+    {
+        <ul class="list-group mb-3">
+            @foreach (var pregunta in Model.Preguntas.OrderBy(p => p.PreguntaId))
+            {
+                <li class="list-group-item">
+                    <form asp-controller="Modulo" asp-action="EditarPregunta" method="post" class="row g-2 align-items-center">
+                        <input type="hidden" name="PreguntaId" value="@pregunta.PreguntaId" />
+                        <input type="hidden" name="ModuloId" value="@Model.ModuloId" />
+
+                        <div class="col-md-4">
+                            <input name="Enunciado" class="form-control" value="@pregunta.Enunciado" required />
+                        </div>
+                        <div class="col-md-1">
+                            <input name="OpcionA" class="form-control" value="@pregunta.OpcionA" required />
+                        </div>
+                        <div class="col-md-1">
+                            <input name="OpcionB" class="form-control" value="@pregunta.OpcionB" required />
+                        </div>
+                        <div class="col-md-1">
+                            <input name="OpcionC" class="form-control" value="@pregunta.OpcionC" required />
+                        </div>
+                        <div class="col-md-1">
+                            <input name="OpcionD" class="form-control" value="@pregunta.OpcionD" required />
+                        </div>
+                        <div class="col-md-2">
+                            <select name="RespuestaCorrecta" class="form-select" required>
+                                <option value="A" selected="@(pregunta.RespuestaCorrecta == "A" ? "selected" : null)">A</option>
+                                <option value="B" selected="@(pregunta.RespuestaCorrecta == "B" ? "selected" : null)">B</option>
+                                <option value="C" selected="@(pregunta.RespuestaCorrecta == "C" ? "selected" : null)">C</option>
+                                <option value="D" selected="@(pregunta.RespuestaCorrecta == "D" ? "selected" : null)">D</option>
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <button type="submit" class="btn btn-sm btn-success">Actualizar</button>
+                        </div>
+                    </form>
+                </li>
+            }
+        </ul>
+    }
+    else
+    {
+        <div class="alert alert-info mb-3">
+            No hay preguntas agregadas aún.
+        </div>
+    }
+
+    <!-- =========================
+         AGREGAR NUEVAS PREGUNTAS
+         ========================= -->
+    @if (Model.Preguntas.Count < Model.CantidadPreguntas)
+    {
+        <h5>Agregar nueva pregunta</h5>
+        <form asp-controller="Modulo" asp-action="CrearPregunta" method="post">
+            <input type="hidden" name="ModuloId" value="@Model.ModuloId" />
+
+            <div class="mb-2">
+                <input name="Enunciado" class="form-control mb-1" placeholder="Enunciado" required />
+                <input name="OpcionA" class="form-control mb-1" placeholder="Opción A" required />
+                <input name="OpcionB" class="form-control mb-1" placeholder="Opción B" required />
+                <input name="OpcionC" class="form-control mb-1" placeholder="Opción C" required />
+                <input name="OpcionD" class="form-control mb-1" placeholder="Opción D" required />
+                <select name="RespuestaCorrecta" class="form-select mb-2" required>
+                    <option value="">Seleccione la correcta</option>
+                    <option value="A">A</option>
+                    <option value="B">B</option>
+                    <option value="C">C</option>
+                    <option value="D">D</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-success">Agregar Pregunta</button>
+        </form>
+    }
+    else
+    {
+        <div class="alert alert-success">
+            El módulo ya tiene la cantidad requerida de preguntas.
+        </div>
+    }
+
+</div>
+

@@ -25,7 +25,7 @@
 
                 <!-- LOGO / MARCA -->
                 <a class="navbar-brand fw-semibold d-flex align-items-center gap-2"
-                   asp-controller="Home"
+                   asp-controller="Alumno"
                    asp-action="Index">
 
                     <img src="~/images/logo.jpeg"
@@ -50,21 +50,21 @@
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
                             <a class="nav-link text-dark"
-                               asp-controller="Home"
+                               asp-controller="Alumno"
                                asp-action="Index">
-                                Inicio de Sesión
+                                Mis Cursos
                             </a>
                         </li>
                     </ul>
 
                     <!-- Menú derecho (solo si hay sesión) -->
-                    @if (nombre != null)
+                    @if (!string.IsNullOrEmpty(nombre))
                     {
                         <ul class="navbar-nav align-items-center">
 
                             <li class="nav-item me-3">
                                 <span class="nav-link text-dark">
-                                    👤 @nombre (@tipo)
+                                    👤 @nombre
                                 </span>
                             </li>
 
@@ -76,14 +76,6 @@
                                     </span>
                                 </li>
                             }
-
-                            <li class="nav-item">
-                                <a class="btn btn-outline-dark btn-sm"
-                                   asp-controller="GestionUsuarios"
-                                   asp-action="Index">
-                                    Geston de Usuarios
-                                </a>
-                            </li>
 
                             <li class="nav-item">
                                 <a class="btn btn-outline-danger btn-sm"

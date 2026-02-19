@@ -1,0 +1,80 @@
+﻿@model LMS.Models.Entidades.Modulo
+
+@{
+    ViewData["Title"] = "Crear Módulo";
+}
+
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Crear Módulo</h4>
+        </div>
+
+        <div class="card-body">
+            <div asp-validation-summary="All" class="text-danger"></div>
+
+            <form asp-controller="Modulo"
+                  asp-action="CrearModulo"
+                  method="post"
+                  enctype="multipart/form-data">
+
+                <input type="hidden" asp-for="CursoId" />
+
+                <div class="mb-3">
+                    <label asp-for="Titulo" class="form-label">Título</label>
+                    <input asp-for="Titulo" class="form-control" required />
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Descripcion" class="form-label">Descripción</label>
+                    <textarea asp-for="Descripcion" class="form-control" rows="3" required></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="ContenidoTexto" class="form-label">Contenido de texto</label>
+                    <textarea asp-for="ContenidoTexto" class="form-control" rows="4"></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Video (MP4)</label>
+                    <input type="file" name="video" class="form-control" accept="video/mp4" />
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="NotaMinima" class="form-label">Nota mínima</label>
+                        <input asp-for="NotaMinima" type="number" step="0.01" class="form-control" required />
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Orden" class="form-label">Orden del módulo</label>
+                        <input asp-for="Orden" type="number" class="form-control" required />
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="CantidadPreguntas" class="form-label">Cantidad de preguntas</label>
+                    <select asp-for="CantidadPreguntas" class="form-select" required>
+                        <option value="">Seleccione</option>
+                        <option value="3">3 preguntas</option>
+                        <option value="5">5 preguntas</option>
+                        <option value="10">10 preguntas</option>
+                    </select>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <a asp-controller="Profesor"
+                       asp-action="Detalle"
+                       asp-route-id="@Model.CursoId"
+                       class="btn btn-secondary">
+                        Volver
+                    </a>
+
+                    <button type="submit" class="btn btn-success">
+                        Guardar Módulo
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
