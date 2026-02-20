@@ -4,6 +4,7 @@ using LMS.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LMS.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260220074542_SeedCoordinador")]
+    partial class SeedCoordinador
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -461,21 +464,17 @@ namespace LMS.Migrations
 
             modelBuilder.Entity("LMS.Models.Entidades.ResultadoModulo", b =>
                 {
-                    b.HasOne("LMS.Models.Entidades.Estudiante", "Estudiante")
+                    b.HasOne("LMS.Models.Entidades.Estudiante", null)
                         .WithMany()
                         .HasForeignKey("EstudianteCedula")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("LMS.Models.Entidades.Modulo", "Modulo")
-                        .WithMany("Resultados")
+                    b.HasOne("LMS.Models.Entidades.Modulo", null)
+                        .WithMany()
                         .HasForeignKey("ModuloId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Estudiante");
-
-                    b.Navigation("Modulo");
                 });
 
             modelBuilder.Entity("LMS.Models.Entidades.Curso", b =>
@@ -493,8 +492,6 @@ namespace LMS.Migrations
             modelBuilder.Entity("LMS.Models.Entidades.Modulo", b =>
                 {
                     b.Navigation("Preguntas");
-
-                    b.Navigation("Resultados");
                 });
 
             modelBuilder.Entity("LMS.Models.Entidades.Profesor", b =>

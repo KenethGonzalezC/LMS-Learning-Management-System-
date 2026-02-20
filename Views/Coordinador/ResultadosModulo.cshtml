@@ -1,0 +1,71 @@
+﻿@model LMS.Models.Entidades.Modulo
+
+@{
+    Layout = "~/Views/Shared/_LayoutCoordinador.cshtml";
+    ViewData["Title"] = $"Resultados - {Model.Titulo}";
+}
+
+<div class="container mt-4">
+
+    <!-- ===================== HEADER ===================== -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Resultados: @Model.Titulo</h2>
+
+        <a asp-controller="Coordinador"
+           asp-action="VerCurso"
+           asp-route-id="@Model.CursoId"
+           class="btn btn-secondary btn-sm">
+            ← Volver al Curso
+        </a>
+    </div>
+
+    <!-- ===================== INFORMACIÓN DEL MÓDULO ===================== -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <p class="mb-1"><strong>Curso:</strong> @Model.Curso?.Nombre</p>
+            <p class="mb-1"><strong>Descripción:</strong> @Model.Descripcion</p>
+            <p class="mb-0"><strong>Nota mínima:</strong> @Model.NotaMinima</p>
+        </div>
+    </div>
+
+    <!-- ===================== TABLA DE RESULTADOS ===================== -->
+    @if (Model.Resultados == null || !Model.Resultados.Any())
+    {
+        <div class="alert alert-info">
+            No hay resultados registrados para este módulo.
+        </div>
+    }
+    else
+    {
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>Cédula</th>
+                    <th>Nombre</th>
+                    <th>Nota Obtenida</th>
+                    <th>Aprobado</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var r in Model.Resultados)
+                {
+                    <tr>
+                        <td>@r.EstudianteCedula</td>
+                        <td>@r.Estudiante?.Nombre</td>
+                        <td>@r.NotaObtenida</td>
+                        <td>
+                            @if (r.Aprobado)
+                            {
+                                <span class="badge bg-success">Sí</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">No</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

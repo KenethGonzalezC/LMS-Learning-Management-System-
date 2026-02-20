@@ -255,5 +255,32 @@ namespace LMS.Controllers
 
             return View((estudiante, asistencias));
         }
+
+        //resultados
+        public IActionResult ResultadosModulo(int moduloId)
+        {
+            // Validar sesión de profesor
+            if (HttpContext.Session.GetString("UsuarioTipo") != "Profesor")
+                return RedirectToAction("ProfesorLogin", "Auth");
+
+            // Obtener módulo con su curso
+            var modulo = _context.Modulos
+                .Include(m => m.Curso)
+                .FirstOrDefault(m => m.ModuloId == moduloId);
+
+            if (modulo == null)
+                return NotFound();
+
+            // Traer resultados de todos los estudiantes para ese módulo
+            var resultados = _context.ResultadosModulos
+                .Include(r => r.Estudiante)
+                .Where(r => r.ModuloId == moduloId)
+                .ToList();
+
+            ViewBag.Modulo = modulo;
+            ViewBag.Curso = modulo.Curso;
+
+            return View(resultados); // enviaremos la lista a la vista
+        }
     }
 }

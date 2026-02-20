@@ -19,5 +19,6 @@ namespace LMS.Models.Entidades
         [Range(3, 10)]
         public int CantidadPreguntas { get; set; }
         public ICollection<Pregunta>? Preguntas { get; set; }
+        public ICollection<ResultadoModulo>? Resultados { get; set; }
     }
 }

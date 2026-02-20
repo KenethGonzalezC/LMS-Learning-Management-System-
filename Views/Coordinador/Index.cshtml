@@ -1,0 +1,41 @@
+﻿@model List<LMS.Models.Entidades.Curso>
+
+@{
+    Layout = "~/Views/Shared/_LayoutCoordinador.cshtml";
+}
+
+<div class="container mt-4">
+
+    <h2>Panel Global Coordinador</h2>
+
+    <form method="get" class="mb-4">
+        <select name="sede" class="form-select w-25 d-inline">
+            <option value="Todos">Todos</option>
+            <option value="Hatillo">Hatillo</option>
+            <option value="Linda Vista">Linda Vista</option>
+            <option value="Alajuelita">Alajuelita</option>
+        </select>
+
+        <button class="btn btn-primary btn-sm ms-2">
+            Filtrar
+        </button>
+    </form>
+
+    @foreach (var curso in Model)
+    {
+        <div class="card mb-3 shadow-sm">
+            <div class="card-body">
+                <h5>@curso.Nombre</h5>
+                <p><strong>Sede:</strong> @curso.Sede.Nombre</p>
+                <p><strong>Módulos:</strong> @curso.Modulos.Count</p>                
+            </div>
+            <a asp-controller="Coordinador"
+               asp-action="VerCurso"
+               asp-route-id="@curso.CursoId"
+               class="btn btn-outline-primary btn-sm">
+                Ver Curso
+            </a>
+        </div>
+    }
+
+</div>

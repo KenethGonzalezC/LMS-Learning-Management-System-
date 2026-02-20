@@ -101,6 +101,7 @@ namespace LMS.Controllers
             if (modulo == null)
                 return NotFound();
 
+            //puntaje
             int correctas = 0;
 
             foreach (var pregunta in modulo.Preguntas)
@@ -117,6 +118,7 @@ namespace LMS.Controllers
                 ? (int)Math.Round((double)correctas / total * 100)
                 : 0;
 
+            // Guardar en EstudianteModulo
             var registro = _context.EstudiantesModulos
                 .FirstOrDefault(em => em.EstudianteCedula == cedula
                                    && em.ModuloId == moduloId);
@@ -138,6 +140,29 @@ namespace LMS.Controllers
                 {
                     registro.Puntaje = puntaje;
                 }
+            }
+
+            // 🔹 Guardar en ResultadoModulo para Coordinador
+            var resultado = _context.ResultadosModulos
+                .FirstOrDefault(r => r.EstudianteCedula == cedula && r.ModuloId == moduloId);
+
+            bool aprobado = puntaje >= modulo.NotaMinima;
+
+            if (resultado == null)
+            {
+                resultado = new ResultadoModulo
+                {
+                    EstudianteCedula = cedula,
+                    ModuloId = moduloId,
+                    NotaObtenida = puntaje,
+                    Aprobado = aprobado
+                };
+                _context.ResultadosModulos.Add(resultado);
+            }
+            else if (puntaje > resultado.NotaObtenida)
+            {
+                resultado.NotaObtenida = puntaje;
+                resultado.Aprobado = aprobado;
             }
 
             _context.SaveChanges();

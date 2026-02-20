@@ -1,0 +1,53 @@
+﻿@model LMS.Models.Entidades.Curso
+@{
+    Layout = "~/Views/Shared/_LayoutCoordinador.cshtml";
+}
+
+<div class="container mt-4">
+
+    <h2>@Model.Nombre</h2>
+
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <p><strong>Sede:</strong> @Model.Sede.Nombre</p>
+            <p><strong>Descripción:</strong> @Model.Descripcion</p>
+            <p><strong>Módulos:</strong> @Model.Modulos.Count</p>
+        </div>
+    </div>
+
+    <h4>Módulos</h4>
+
+    @if (!Model.Modulos.Any())
+    {
+        <div class="alert alert-info">
+            No hay módulos creados.
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var modulo in Model.Modulos.OrderBy(m => m.Orden))
+            {
+                <div class="col-md-4 mb-3">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body">
+                            <h5>@modulo.Titulo</h5>
+                            <p>@modulo.Descripcion</p>
+                            <p><strong>Preguntas:</strong> @modulo.Preguntas.Count</p>
+                            <p><strong>Nota mínima:</strong> @modulo.NotaMinima</p>
+                        </div>
+                        <div class="card-footer">
+                            <a asp-controller="Coordinador"
+                               asp-action="VerModulo"
+                               asp-route-id="@modulo.ModuloId"
+                               class="btn btn-primary btn-sm">
+                                Ver Contenido
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+</div>

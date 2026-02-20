@@ -20,6 +20,8 @@ namespace LMS.Data
         public DbSet<ResultadoModulo> ResultadosModulos => Set<ResultadoModulo>();
         public DbSet<Sede> Sedes => Set<Sede>();
         public DbSet<Asistencia> Asistencias { get; set; }
+        public DbSet<Coordinador> Coordinadores { get; set; }
+        public ICollection<ResultadoModulo>? Resultados { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -137,6 +139,31 @@ namespace LMS.Data
             modelBuilder.Entity<ResultadoModulo>()
                 .Property(r => r.NotaObtenida)
                 .HasPrecision(5, 2);
+
+            // ===============================
+            // ENTIDAD PARA COORDINADOR
+            // ===============================
+            modelBuilder.Entity<Coordinador>().HasData(
+                new Coordinador
+                    {
+                        CoordinadorId = 1,
+                        Usuario = "admin",
+                        Password = "1234"
+                    }
+            );
+
+            // ===============================
+            // RESULTADOS EN MODULOS PARA CORD
+            // ===============================
+            modelBuilder.Entity<ResultadoModulo>()
+                .HasOne(r => r.Modulo)
+                .WithMany(m => m.Resultados)
+                .HasForeignKey(r => r.ModuloId);
+
+            modelBuilder.Entity<ResultadoModulo>()
+                .HasOne(r => r.Estudiante)
+                .WithMany()
+                .HasForeignKey(r => r.EstudianteCedula);
         }
     }
 }

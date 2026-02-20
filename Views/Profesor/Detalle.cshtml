@@ -83,7 +83,7 @@
                                class="btn btn-primary btn-sm">
                                 Ver Módulo
                             </a>
-
+                            
                             <!-- Editar Módulo → ModuloController -->
                             <a asp-controller="Modulo"
                                asp-action="Editar"
@@ -101,6 +101,13 @@
                                 <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
                             </form>
                         </div>
+                        <!-- Ver Estadisticas → ProfesorController -->
+                        <a asp-controller="Profesor"
+                           asp-action="ResultadosModulo"
+                           asp-route-moduloId="@modulo.ModuloId"
+                           class="btn btn-info btn-sm">
+                            📊 Ver Resultados
+                        </a>
                     </div>
                 </div>
             }

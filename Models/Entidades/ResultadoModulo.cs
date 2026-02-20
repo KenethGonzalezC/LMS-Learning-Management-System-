@@ -7,5 +7,8 @@
         public int ModuloId { get; set; }
         public decimal NotaObtenida { get; set; }
         public bool Aprobado { get; set; }
+        // Navegation properties
+        public Estudiante Estudiante { get; set; } = null!;
+        public Modulo Modulo { get; set; } = null!;
     }
 }

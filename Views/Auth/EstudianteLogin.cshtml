@@ -4,47 +4,35 @@
     ViewData["Title"] = "Login Estudiante";
 }
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-5">
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="card shadow-sm p-4" style="width: 400px;">
+        <div class="text-center mb-4">
+            <img src="~/images/logo.jpeg" alt="Logo" style="height:60px;" class="mb-2" />
+            <h3>Ingreso Estudiante</h3>
+            <p class="text-muted">Accede a tus cursos y módulos</p>
+        </div>
 
-            <div class="card shadow-sm">
-                <div class="card-body">
+        @if (ViewBag.Error != null)
+        {
+            <div class="alert alert-danger text-center">
+                @ViewBag.Error
+            </div>
+        }
 
-                    <h4 class="text-center mb-4">Ingreso Estudiante</h4>
-
-                    @if (ViewBag.Error != null)
-                    {
-                        <div class="alert alert-danger text-center">
-                            @ViewBag.Error
-                        </div>
-                    }
-
-                    <form asp-action="EstudianteLogin" method="post">
-
-                        <div class="mb-3">
-                            <label asp-for="Cedula" class="form-label"></label>
-                            <input asp-for="Cedula" class="form-control" />
-                            <span asp-validation-for="Cedula" class="text-danger"></span>
-                        </div>
-
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-success">
-                                Ingresar
-                            </button>
-
-                            <a asp-controller="Home"
-                               asp-action="Index"
-                               class="btn btn-secondary">
-                                Volver
-                            </a>
-                        </div>
-
-                    </form>
-
-                </div>
+        <form asp-action="EstudianteLogin" method="post">
+            <div class="mb-3">
+                <label asp-for="Cedula" class="form-label">Cédula</label>
+                <input asp-for="Cedula" class="form-control" placeholder="Ingresa tu cédula" />
+                <span asp-validation-for="Cedula" class="text-danger"></span>
             </div>
 
+            <button type="submit" class="btn btn-success w-100">Ingresar</button>
+        </form>
+
+        <div class="mt-2 text-center">
+            <a asp-controller="Home" asp-action="Index" class="btn btn-secondary w-100">
+                Volver
+            </a>
         </div>
     </div>
 </div>

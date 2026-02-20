@@ -115,6 +115,32 @@ namespace LMS.Controllers
             HttpContext.Session.Clear();
             return RedirectToAction("Index", "Home");
         }
+
+        // ===============================
+        // Login de Coordinador
+        // ===============================
+        public IActionResult CoordinadorLogin()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult CoordinadorLogin(string usuario, string password)
+        {
+            var coordinador = _context.Coordinadores
+                .FirstOrDefault(c => c.Usuario == usuario && c.Password == password);
+
+            if (coordinador == null)
+            {
+                ViewBag.Error = "Credenciales incorrectas";
+                return View();
+            }
+
+            HttpContext.Session.SetString("UsuarioTipo", "Coordinador");
+            HttpContext.Session.SetString("UsuarioNombre", coordinador.Usuario);
+
+            return RedirectToAction("Index", "Coordinador");
+        }
     }
 }
 

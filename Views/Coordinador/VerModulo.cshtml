@@ -1,0 +1,74 @@
+﻿@model LMS.Models.Entidades.Modulo
+@{
+    Layout = "~/Views/Shared/_LayoutCoordinador.cshtml";
+}
+
+<div class="container mt-4">
+
+    <h2>@Model.Titulo</h2>
+    <p>@Model.Descripcion</p>
+
+    @if (!string.IsNullOrEmpty(Model.VideoPath))
+    {
+        <video width="700" controls class="mb-3">
+            <source src="@Model.VideoPath" type="video/mp4" />
+        </video>
+    }
+
+    <hr />
+
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <p><strong>Descripción:</strong> @Model.Descripcion</p>
+            <p><strong>Nota mínima:</strong> @Model.NotaMinima</p>
+        </div>
+    </div>
+
+    <h4>Preguntas</h4>
+
+    @if (!Model.Preguntas.Any())
+    {
+        <div class="alert alert-warning">
+            No hay preguntas registradas.
+        </div>
+    }
+    else
+    {
+        <div class="accordion" id="preguntasAccordion">
+            @foreach (var pregunta in Model.Preguntas)
+            {
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed"
+                                type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#collapse@pregunta.PreguntaId">
+                            @pregunta.Enunciado
+                        </button>
+                    </h2>
+                    <div id="collapse@pregunta.PreguntaId"
+                         class="accordion-collapse collapse"
+                         data-bs-parent="#preguntasAccordion">
+                        <div class="accordion-body">
+                            <strong>Respuesta correcta:</strong>
+                            @pregunta.RespuestaCorrecta
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+</div>
+
+<h6></h6>
+
+@if (Context.Session.GetString("UsuarioTipo") == "Coordinador")
+{
+    <a asp-controller="Coordinador"
+       asp-action="ResultadosModulo"
+       asp-route-moduloId="@Model.ModuloId"
+       class="btn btn-outline-success btn-sm mb-3">
+        📊 Ver Resultados
+    </a>
+}
