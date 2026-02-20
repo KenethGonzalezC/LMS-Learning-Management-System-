@@ -1,4 +1,6 @@
 using LMS.Data;
+using LMS.Services;
+
 //using BitacoraAlfipac.Data.Seed;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
@@ -27,7 +29,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // ==========================
 // SERVICES
 // ==========================
-//builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<CertificadoService>();
 
 // ==========================
 // AUTHENTICATION (Cookies)

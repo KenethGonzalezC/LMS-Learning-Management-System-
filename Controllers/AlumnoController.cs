@@ -1,5 +1,6 @@
 ﻿using LMS.Data;
 using LMS.Models.Entidades;
+using LMS.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,10 +9,12 @@ namespace LMS.Controllers
     public class AlumnoController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly CertificadoService _certificadoService;
 
-        public AlumnoController(ApplicationDbContext context)
+        public AlumnoController(ApplicationDbContext context, CertificadoService certificadoService)
         {
             _context = context;
+            _certificadoService = certificadoService;
         }
 
         // =====================================
@@ -55,6 +58,25 @@ namespace LMS.Controllers
 
             if (!pertenece)
                 return RedirectToAction("Index");
+
+            // Registrar asistencia
+            var yaRegistradoHoy = _context.Asistencias.Any(a =>
+                a.CursoId == cursoId &&
+                a.EstudianteCedula == cedula &&
+                a.FechaHora.Date == DateTime.Today);
+
+            if (!yaRegistradoHoy)
+            {
+                var asistencia = new Asistencia
+                {
+                    CursoId = cursoId,
+                    EstudianteCedula = cedula,
+                    FechaHora = DateTime.Now
+                };
+
+                _context.Asistencias.Add(asistencia);
+                _context.SaveChanges();
+            }
 
             var puntajes = _context.EstudiantesModulos
                 .Where(em => em.EstudianteCedula == cedula)
@@ -182,6 +204,50 @@ namespace LMS.Controllers
                 .FirstOrDefault(p => p.ModuloId == moduloId);
 
             return View(modulo);
+        }
+
+        public IActionResult DescargarCertificado(int cursoId)
+        {
+            if (HttpContext.Session.GetString("UsuarioTipo") != "Estudiante")
+                return RedirectToAction("EstudianteLogin", "Auth");
+
+            var estudianteCedula = HttpContext.Session.GetString("UsuarioCedula");
+
+            var estudiante = _context.Estudiantes
+                .FirstOrDefault(e => e.Cedula == estudianteCedula);
+
+            var curso = _context.Cursos
+                .Include(c => c.Modulos)
+                .FirstOrDefault(c => c.CursoId == cursoId);
+
+            if (estudiante == null || curso == null)
+                return NotFound();
+
+            var registrosEstudiante = _context.EstudiantesModulos
+                .Where(em => em.EstudianteCedula == estudianteCedula &&
+                             curso.Modulos.Select(m => m.ModuloId).Contains(em.ModuloId))
+                .ToList();
+
+            bool cursoAprobado = curso.Modulos.All(m =>
+            {
+                var registro = registrosEstudiante
+                    .FirstOrDefault(r => r.ModuloId == m.ModuloId);
+
+                return registro != null && registro.Puntaje >= m.NotaMinima;
+            });
+
+            if (!cursoAprobado)
+            {
+                TempData["Error"] = "Debes aprobar todos los módulos para descargar el certificado.";
+                return RedirectToAction("VerCurso", new { cursoId = cursoId });
+            }
+
+            var pdf = _certificadoService.GenerarCertificado(
+                estudiante.Nombre,
+                curso.Nombre
+            );
+
+            return File(pdf, "application/pdf", $"Certificado_{curso.Nombre}.pdf");
         }
     }
 }

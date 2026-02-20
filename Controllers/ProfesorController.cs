@@ -220,5 +220,40 @@ namespace LMS.Controllers
 
             return RedirectToAction("Detalle", new { id = cursoId });
         }
+
+        //Asistencia
+        public IActionResult Asistencia(int cursoId)
+        {
+            var curso = _context.Cursos
+                .Include(c => c.EstudiantesCursos)
+                    .ThenInclude(ec => ec.Estudiante)
+                .FirstOrDefault(c => c.CursoId == cursoId);
+
+            if (curso == null)
+                return NotFound();
+
+            return View(curso);
+        }
+        public IActionResult AsistenciaDetalle(int cursoId, string cedula)
+        {
+            var estudiante = _context.Estudiantes
+                .FirstOrDefault(e => e.Cedula == cedula);
+
+            if (estudiante == null)
+                return NotFound();
+
+            var asistencias = _context.Asistencias
+                .Where(a => a.CursoId == cursoId && a.EstudianteCedula == cedula)
+                .OrderByDescending(a => a.FechaHora)
+                .ToList();
+
+            ViewBag.CursoId = cursoId;
+            ViewBag.NombreCurso = _context.Cursos
+                .Where(c => c.CursoId == cursoId)
+                .Select(c => c.Nombre)
+                .FirstOrDefault();
+
+            return View((estudiante, asistencias));
+        }
     }
 }

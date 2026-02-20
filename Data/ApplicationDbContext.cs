@@ -19,6 +19,7 @@ namespace LMS.Data
         public DbSet<EstudianteModulo> EstudiantesModulos => Set<EstudianteModulo>();
         public DbSet<ResultadoModulo> ResultadosModulos => Set<ResultadoModulo>();
         public DbSet<Sede> Sedes => Set<Sede>();
+        public DbSet<Asistencia> Asistencias { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

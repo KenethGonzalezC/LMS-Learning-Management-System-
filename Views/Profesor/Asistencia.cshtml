@@ -1,0 +1,49 @@
+﻿@model LMS.Models.Entidades.Curso
+
+@{
+    ViewData["Title"] = "Asistencia";
+}
+
+<div class="container mt-4">
+
+    <h2>Asistencia - @Model.Nombre</h2>
+
+    <a asp-controller="Profesor"
+       asp-action="Detalle"
+       asp-route-id="@Model.CursoId"
+       class="btn btn-secondary btn-sm mb-3">
+        ← Volver al Curso
+    </a>
+
+    @if (!Model.EstudiantesCursos.Any())
+    {
+        <div class="alert alert-info">
+            No hay estudiantes inscritos.
+        </div>
+    }
+    else
+    {
+        <div class="list-group">
+            @foreach (var est in Model.EstudiantesCursos)
+            {
+                <a asp-controller="Profesor"
+                   asp-action="AsistenciaDetalle"
+                   asp-route-cursoId="@Model.CursoId"
+                   asp-route-cedula="@est.Estudiante.Cedula"
+                   class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+
+                    <span>
+                        <strong>@est.Estudiante.Nombre</strong>
+                        <br />
+                        <small class="text-muted">@est.Estudiante.Cedula</small>
+                    </span>
+
+                    <span class="badge bg-primary rounded-pill">
+                        Ver historial →
+                    </span>
+                </a>
+            }
+        </div>
+    }
+
+</div>

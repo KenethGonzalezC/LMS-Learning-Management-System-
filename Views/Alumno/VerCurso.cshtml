@@ -85,3 +85,23 @@
         </div>
     </div>
 }
+
+@{
+    var todosAprobados = Model.Modulos.All(m =>
+    {
+        var reg = puntajes?.FirstOrDefault(p => p.ModuloId == m.ModuloId);
+        return reg != null && reg.Puntaje >= m.NotaMinima;
+    });
+}
+
+@if (todosAprobados)
+{
+    <div class="text-center mt-4">
+        <a asp-action="DescargarCertificado"
+           asp-controller="Alumno"
+           asp-route-cursoId="@Model.CursoId"
+           class="btn btn-success btn-lg">
+            🏆 Obtener Certificado
+        </a>
+    </div>
+}
