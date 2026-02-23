@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -10,6 +11,20 @@ namespace LMS.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "Coordinadores",
+                columns: table => new
+                {
+                    CoordinadorId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Usuario = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Coordinadores", x => x.CoordinadorId);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Sedes",
                 columns: table => new
@@ -89,6 +104,33 @@ namespace LMS.Migrations
                         principalTable: "Sedes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Asistencias",
+                columns: table => new
+                {
+                    AsistenciaId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    EstudianteCedula = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    CursoId = table.Column<int>(type: "int", nullable: false),
+                    FechaHora = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Asistencias", x => x.AsistenciaId);
+                    table.ForeignKey(
+                        name: "FK_Asistencias_Cursos_CursoId",
+                        column: x => x.CursoId,
+                        principalTable: "Cursos",
+                        principalColumn: "CursoId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Asistencias_Estudiantes_EstudianteCedula",
+                        column: x => x.EstudianteCedula,
+                        principalTable: "Estudiantes",
+                        principalColumn: "Cedula",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -180,6 +222,7 @@ namespace LMS.Migrations
                     OpcionC = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     OpcionD = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     RespuestaCorrecta = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ProfesorId = table.Column<int>(type: "int", nullable: false),
                     ModuloId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -190,6 +233,12 @@ namespace LMS.Migrations
                         column: x => x.ModuloId,
                         principalTable: "Modulos",
                         principalColumn: "ModuloId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Preguntas_Profesores_ProfesorId",
+                        column: x => x.ProfesorId,
+                        principalTable: "Profesores",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -220,6 +269,21 @@ namespace LMS.Migrations
                         principalColumn: "ModuloId",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.InsertData(
+                table: "Coordinadores",
+                columns: new[] { "CoordinadorId", "Password", "Usuario" },
+                values: new object[] { 1, "1234", "admin" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Asistencias_CursoId",
+                table: "Asistencias",
+                column: "CursoId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Asistencias_EstudianteCedula",
+                table: "Asistencias",
+                column: "EstudianteCedula");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Cursos_ProfesorId",
@@ -262,6 +326,11 @@ namespace LMS.Migrations
                 column: "ModuloId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Preguntas_ProfesorId",
+                table: "Preguntas",
+                column: "ProfesorId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Profesores_SedeId",
                 table: "Profesores",
                 column: "SedeId");
@@ -280,6 +349,12 @@ namespace LMS.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "Asistencias");
+
+            migrationBuilder.DropTable(
+                name: "Coordinadores");
+
             migrationBuilder.DropTable(
                 name: "EstudiantesCursos");
 

@@ -19,12 +19,20 @@ namespace LMS.Controllers
         // =========================
         // CREAR MÓDULO - GET
         // =========================
-        [HttpGet]
+        // =========================
+        // CREAR MÓDULO - GET
+        // =========================
         public IActionResult CrearModulo(int cursoId)
         {
+            var ultimoOrden = _context.Modulos
+                .Where(m => m.CursoId == cursoId)
+                .Select(m => (int?)m.Orden)
+                .Max() ?? 0;
+
             var modulo = new Modulo
             {
-                CursoId = cursoId
+                CursoId = cursoId,
+                Orden = ultimoOrden + 1
             };
 
             return View(modulo);
@@ -71,6 +79,13 @@ namespace LMS.Controllers
 
                 model.VideoPath = "/videos/" + nombreUnico;
             }
+
+            var ultimoOrden = _context.Modulos
+                .Where(m => m.CursoId == model.CursoId)
+                .Select(m => (int?)m.Orden)
+                .Max() ?? 0;
+
+            model.Orden = ultimoOrden + 1;
 
             _context.Modulos.Add(model);
             await _context.SaveChangesAsync();

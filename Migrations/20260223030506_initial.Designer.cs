@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LMS.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260220071733_CrearTablaAsistencias")]
-    partial class CrearTablaAsistencias
+    [Migration("20260223030506_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -50,6 +50,35 @@ namespace LMS.Migrations
                     b.HasIndex("EstudianteCedula");
 
                     b.ToTable("Asistencias");
+                });
+
+            modelBuilder.Entity("LMS.Models.Entidades.Coordinador", b =>
+                {
+                    b.Property<int>("CoordinadorId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CoordinadorId"));
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Usuario")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("CoordinadorId");
+
+                    b.ToTable("Coordinadores");
+
+                    b.HasData(
+                        new
+                        {
+                            CoordinadorId = 1,
+                            Password = "1234",
+                            Usuario = "admin"
+                        });
                 });
 
             modelBuilder.Entity("LMS.Models.Entidades.Curso", b =>
@@ -435,17 +464,21 @@ namespace LMS.Migrations
 
             modelBuilder.Entity("LMS.Models.Entidades.ResultadoModulo", b =>
                 {
-                    b.HasOne("LMS.Models.Entidades.Estudiante", null)
+                    b.HasOne("LMS.Models.Entidades.Estudiante", "Estudiante")
                         .WithMany()
                         .HasForeignKey("EstudianteCedula")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("LMS.Models.Entidades.Modulo", null)
-                        .WithMany()
+                    b.HasOne("LMS.Models.Entidades.Modulo", "Modulo")
+                        .WithMany("Resultados")
                         .HasForeignKey("ModuloId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Estudiante");
+
+                    b.Navigation("Modulo");
                 });
 
             modelBuilder.Entity("LMS.Models.Entidades.Curso", b =>
@@ -463,6 +496,8 @@ namespace LMS.Migrations
             modelBuilder.Entity("LMS.Models.Entidades.Modulo", b =>
                 {
                     b.Navigation("Preguntas");
+
+                    b.Navigation("Resultados");
                 });
 
             modelBuilder.Entity("LMS.Models.Entidades.Profesor", b =>
