@@ -59,6 +59,10 @@ using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
+    // 🔥 Esto aplica migraciones automáticamente
+    context.Database.Migrate();
+
+    // 🌱 Luego ejecuta el Seed
     DbInitializer.Seed(context);
 }
 
