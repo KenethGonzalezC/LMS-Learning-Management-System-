@@ -22,6 +22,7 @@ namespace LMS.Data
         public DbSet<Asistencia> Asistencias { get; set; }
         public DbSet<Coordinador> Coordinadores { get; set; }
         public ICollection<ResultadoModulo>? Resultados { get; set; }
+        public DbSet<Clase> Clases => Set<Clase>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -164,6 +165,15 @@ namespace LMS.Data
                 .HasOne(r => r.Estudiante)
                 .WithMany()
                 .HasForeignKey(r => r.EstudianteCedula);
+
+            // ===============================
+            // CLASE PARA CURSO
+            // ===============================
+            modelBuilder.Entity<Clase>()
+                .HasOne(c => c.Curso)
+                .WithMany(cu => cu.Clases)
+                .HasForeignKey(c => c.CursoId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

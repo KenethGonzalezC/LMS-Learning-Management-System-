@@ -1,0 +1,92 @@
+﻿@model LMS.Models.Entidades.Clase
+
+@{
+    ViewData["Title"] = "Editar Clase";
+}
+
+<div class="container mt-4">
+
+    <h3>Editar Clase: @Model.Titulo</h3>
+
+    @if (TempData["Mensaje"] != null)
+    {
+        <div class="alert alert-success">@TempData["Mensaje"]</div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <!-- =========================
+         FORMULARIO EDITAR CLASE
+         ========================= -->
+    <form asp-action="Editar" method="post" enctype="multipart/form-data" class="mb-4">
+
+        <div asp-validation-summary="All" class="text-danger"></div>
+
+        <input type="hidden" asp-for="ClaseId" />
+        <input type="hidden" asp-for="CursoId" />
+
+        <div class="mb-3">
+            <label class="form-label">Título</label>
+            <input asp-for="Titulo" class="form-control" required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Descripción</label>
+            <textarea asp-for="Descripcion" class="form-control"></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Contenido de la clase</label>
+            <textarea asp-for="ContenidoTexto" class="form-control" rows="5"></textarea>
+        </div>
+
+        <!-- 🔥 IMAGEN -->
+        <div class="mb-3">
+            <label class="form-label">Imagen de apoyo (opcional)</label>
+            <input type="file" name="imagen" class="form-control" />
+
+            @if (!string.IsNullOrEmpty(Model.VideoPath))
+            {
+                <div class="mt-2">
+                    <small>Imagen actual:</small><br />
+                    <img src="@Model.VideoPath" width="150" class="rounded shadow-sm" />
+                </div>
+            }
+        </div>
+
+        <!-- 🔥 TIPO DE ENTREGA -->
+        <div class="mb-3">
+            <label class="form-label fw-bold">Tipo de entrega</label>
+
+            <div class="form-check">
+                <input asp-for="RequiereTexto" class="form-check-input" />
+                <label class="form-check-label">Respuesta escrita</label>
+            </div>
+
+            <div class="form-check">
+                <input asp-for="RequiereImagen" class="form-check-input" />
+                <label class="form-check-label">Subir imagen</label>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Orden</label>
+            <input asp-for="Orden" class="form-control" />
+        </div>
+
+        <button type="submit" class="btn btn-success">
+            💾 Actualizar clase
+        </button>
+
+        <a asp-action="Preview"
+               asp-route-id="@Model.ClaseId"
+               class="btn btn-primary ms-2">
+            Ver Preview
+        </a>
+
+    </form>
+
+</div>

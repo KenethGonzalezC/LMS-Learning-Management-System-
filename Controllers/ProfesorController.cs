@@ -36,6 +36,7 @@ namespace LMS.Controllers
             var cursos = await _context.Cursos
                 .Where(c => c.ProfesorId == profesorId)
                 .Include(c => c.Modulos)
+                .Include(c => c.Clases)
                 .Include(c => c.EstudiantesCursos)
                 .ToListAsync();
 
@@ -84,6 +85,7 @@ namespace LMS.Controllers
             var curso = _context.Cursos
                 .Include(c => c.Modulos)
                     .ThenInclude(m => m.Preguntas) // para que modulo.Preguntas no sea null
+                .Include(c => c.Clases)
                 .Include(c => c.EstudiantesCursos)
                     .ThenInclude(ec => ec.Estudiante)
                 .FirstOrDefault(c => c.CursoId == id && c.ProfesorId == profesorId);
@@ -139,8 +141,9 @@ namespace LMS.Controllers
                 _context.Preguntas.RemoveRange(modulo.Preguntas);
             }
 
-            // 4️⃣ Módulos
+            // 4️⃣ Módulos y clases
             _context.Modulos.RemoveRange(curso.Modulos);
+            //_context.Modulos.RemoveRange(curso.Clases);
 
             // 5️⃣ Curso
             _context.Cursos.Remove(curso);

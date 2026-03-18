@@ -18,6 +18,14 @@
                 ← Volver a Mis Cursos
             </a>
 
+            <!-- Añadir Clase → Redirige a ClaseController/Crear -->
+            <a asp-controller="Clase"
+                   asp-action="Crear"
+                   asp-route-cursoId="@Model.CursoId"
+                   class="btn btn-info btn-sm">
+                📘 Añadir Clase
+            </a>
+
             <!-- Añadir Módulo → Redirige a ModuloController/CrearModulo -->
             <a asp-controller="Modulo"
                asp-action="CrearModulo"
@@ -50,6 +58,60 @@
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             @TempData["Error"]
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- ===================== CLASES ===================== -->
+
+    <h4 class="mt-5 mb-3">Clases</h4>
+
+    @if (!Model.Clases.Any())
+    {
+        <div class="alert alert-info">No hay clases creadas.</div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var clase in Model.Clases.OrderBy(c => c.Orden))
+            {
+                <div class="col-md-4 mb-3">
+                    <div class="card shadow-sm">
+
+                        <div class="card-body">
+                            <h5>@clase.Titulo</h5>
+                            <p>@clase.Descripcion</p>
+                        </div>
+
+                        <div class="card-footer d-flex justify-content-between">
+
+                            <a asp-controller="Clase"
+                                   asp-action="Preview"
+                                   asp-route-id="@clase.ClaseId"
+                                   class="btn btn-primary btn-sm">
+                                Ver Clase
+                            </a>
+
+                            <a asp-controller="Clase"
+                                   asp-action="Editar"
+                                   asp-route-id="@clase.ClaseId"
+                                   class="btn btn-warning btn-sm">
+                                Editar
+                            </a>
+
+                            <form asp-controller="Clase"
+                                  asp-action="Eliminar"
+                                  method="post"
+                                  onsubmit="return confirm('¿Eliminar esta clase?');">
+
+                                <input type="hidden" name="claseId" value="@clase.ClaseId" />
+
+                                <button class="btn btn-danger btn-sm">Eliminar</button>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            }
         </div>
     }
 

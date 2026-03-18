@@ -19,6 +19,7 @@ namespace LMS.Models.Entidades
         public ICollection<Modulo> Modulos { get; set; } = new List<Modulo>();
 
         public ICollection<EstudianteCurso> EstudiantesCursos { get; set; } = new List<EstudianteCurso>();
+        public ICollection<Clase> Clases { get; set; } = new List<Clase>();
         public int SedeId { get; set; }
         public Sede Sede { get; set; }
 
