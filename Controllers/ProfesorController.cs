@@ -285,5 +285,45 @@ namespace LMS.Controllers
 
             return View(resultados); // enviaremos la lista a la vista
         }
+
+        //resultados de las clases
+        public IActionResult ResultadosClase(int claseId)
+        {
+            if (!SesionValida())
+                return RedirectToAction("ProfesorLogin", "Auth");
+
+            var clase = _context.Clases
+                .Include(c => c.Curso)
+                .FirstOrDefault(c => c.ClaseId == claseId);
+
+            if (clase == null)
+                return NotFound();
+
+            var entregas = _context.EntregasClases
+                .Include(e => e.Estudiante)
+                .Where(e => e.ClaseId == claseId)
+                .ToList();
+
+            ViewBag.Clase = clase;
+            ViewBag.Curso = clase.Curso;
+
+            return View(entregas);
+        }
+
+        //comentario para la clase
+        [HttpPost]
+        public async Task<IActionResult> GuardarComentario(int entregaId, string comentario)
+        {
+            var entrega = await _context.EntregasClases.FindAsync(entregaId);
+
+            if (entrega == null)
+                return NotFound();
+
+            entrega.ComentarioProfesor = comentario;
+
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("ResultadosClase", new { claseId = entrega.ClaseId });
+        }
     }
 }

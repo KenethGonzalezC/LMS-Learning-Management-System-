@@ -1,0 +1,94 @@
+﻿@model List<LMS.Models.Entidades.EntregaClase>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var clase = ViewBag.Clase;
+    var curso = ViewBag.Curso;
+}
+
+<div class="container mt-4">
+
+    <h2>Entregas - Clase: @clase.Titulo</h2>
+    <h4 class="mb-4">Curso: @curso.Nombre</h4>
+
+    <a asp-controller="Profesor"
+           asp-action="Detalle"
+           asp-route-id="@curso.CursoId"
+           class="btn btn-secondary btn-sm mb-3">
+        ← Volver al Curso
+    </a>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">
+            No hay entregas registradas para esta clase.
+        </div>
+    }
+    else
+    {
+        <table class="table table-bordered table-striped">
+
+            <thead class="table-dark">
+                <tr>
+                    <th>#</th>
+                    <th>Cédula</th>
+                    <th>Nombre</th>
+                    <th>Entrega</th>
+                    <th>Comentario Profesor</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @for (int i = 0; i < Model.Count; i++)
+                {
+                    var e = Model[i];
+
+                    <tr>
+                        <td>@(i + 1)</td>
+                        <td>@e.Estudiante.Cedula</td>
+                        <td>@e.Estudiante.Nombre</td>
+
+                        <!-- 🔹 ENTREGA -->
+                        <td>
+                            @if (!string.IsNullOrEmpty(e.Texto))
+                            {
+                                <div class="mb-2">
+                                    <strong>Texto:</strong>
+                                    <p>@e.Texto</p>
+                                </div>
+                            }
+
+                            @if (!string.IsNullOrEmpty(e.ImagenPath))
+                            {
+                                <div>
+                                    <strong>Imagen:</strong><br />
+                                    <img src="@e.ImagenPath" width="120" class="rounded shadow-sm" />
+                                </div>
+                            }
+                        </td>
+
+                        <!-- 🔥 COMENTARIO -->
+                        <td>
+                            <form asp-action="GuardarComentario" method="post">
+
+                                <input type="hidden" name="entregaId" value="@e.EntregaClaseId" />
+
+                                <textarea name="comentario"
+                                          class="form-control mb-2"
+                                          rows="2">@e.ComentarioProfesor</textarea>
+
+                                <button class="btn btn-success btn-sm">
+                                    Guardar
+                                </button>
+
+                            </form>
+                        </td>
+
+                    </tr>
+                }
+            </tbody>
+
+        </table>
+    }
+
+</div>

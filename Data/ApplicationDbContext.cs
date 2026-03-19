@@ -23,6 +23,7 @@ namespace LMS.Data
         public DbSet<Coordinador> Coordinadores { get; set; }
         public ICollection<ResultadoModulo>? Resultados { get; set; }
         public DbSet<Clase> Clases => Set<Clase>();
+        public DbSet<EntregaClase> EntregasClases => Set<EntregaClase>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

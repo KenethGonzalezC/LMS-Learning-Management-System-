@@ -107,8 +107,15 @@
 
                                 <button class="btn btn-danger btn-sm">Eliminar</button>
                             </form>
-
+                            
                         </div>
+
+                        <a asp-controller="Profesor"
+                               asp-action="ResultadosClase"
+                               asp-route-claseId="@clase.ClaseId"
+                               class="btn btn-info btn-sm">
+                            📥 Ver Entregas
+                        </a>
                     </div>
                 </div>
             }
