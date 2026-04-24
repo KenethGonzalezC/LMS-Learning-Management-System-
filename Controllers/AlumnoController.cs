@@ -3,6 +3,7 @@ using LMS.Models.Entidades;
 using LMS.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Hosting;
 
 namespace LMS.Controllers
 {
@@ -10,11 +11,14 @@ namespace LMS.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly CertificadoService _certificadoService;
+        private readonly IWebHostEnvironment _environment;
 
-        public AlumnoController(ApplicationDbContext context, CertificadoService certificadoService)
+
+        public AlumnoController(ApplicationDbContext context, CertificadoService certificadoService, IWebHostEnvironment environment)
         {
             _context = context;
             _certificadoService = certificadoService;
+            _environment = environment;
         }
 
         // =====================================
@@ -48,41 +52,50 @@ namespace LMS.Controllers
 
             var curso = _context.Cursos
                 .Include(c => c.Modulos)
+                .Include(c => c.Clases)
                 .FirstOrDefault(c => c.CursoId == cursoId);
 
             if (curso == null)
                 return NotFound();
 
-            var pertenece = _context.EstudiantesCursos
-                .Any(ec => ec.CursoId == cursoId && ec.EstudianteCedula == cedula);
+            bool pertenece = _context.EstudiantesCursos.Any(ec =>
+                ec.CursoId == cursoId &&
+                ec.EstudianteCedula == cedula);
 
             if (!pertenece)
                 return RedirectToAction("Index");
 
             // Registrar asistencia
-            var yaRegistradoHoy = _context.Asistencias.Any(a =>
+            bool yaRegistradoHoy = _context.Asistencias.Any(a =>
                 a.CursoId == cursoId &&
                 a.EstudianteCedula == cedula &&
                 a.FechaHora.Date == DateTime.Today);
 
             if (!yaRegistradoHoy)
             {
-                var asistencia = new Asistencia
+                _context.Asistencias.Add(new Asistencia
                 {
                     CursoId = cursoId,
                     EstudianteCedula = cedula,
                     FechaHora = DateTime.Now
-                };
+                });
 
-                _context.Asistencias.Add(asistencia);
                 _context.SaveChanges();
             }
 
+            // Puntajes módulos
             var puntajes = _context.EstudiantesModulos
                 .Where(em => em.EstudianteCedula == cedula)
                 .ToList();
 
             ViewBag.Puntajes = puntajes;
+
+            // Entregas clases
+            var entregas = _context.EntregasClases
+                .Where(e => e.EstudianteCedula == cedula)
+                .ToList();
+
+            ViewBag.Entregas = entregas;
 
             return View(curso);
         }
@@ -273,6 +286,123 @@ namespace LMS.Controllers
             );
 
             return File(pdf, "application/pdf", $"Certificado_{curso.Nombre}.pdf");
+        }
+
+        //clase no calificativa
+        public IActionResult VerClase(int claseId)
+        {
+            if (HttpContext.Session.GetString("UsuarioTipo") != "Estudiante")
+                return RedirectToAction("EstudianteLogin", "Auth");
+
+            var cedula = HttpContext.Session.GetString("UsuarioCedula");
+
+            var clase = _context.Clases
+                .Include(c => c.Curso)
+                .FirstOrDefault(c => c.ClaseId == claseId);
+
+            if (clase == null)
+                return NotFound();
+
+            bool pertenece = _context.EstudiantesCursos.Any(ec =>
+                ec.CursoId == clase.CursoId &&
+                ec.EstudianteCedula == cedula);
+
+            if (!pertenece)
+                return RedirectToAction("Index");
+
+            var entrega = _context.EntregasClases
+                .FirstOrDefault(e =>
+                    e.ClaseId == claseId &&
+                    e.EstudianteCedula == cedula);
+
+            ViewBag.Entrega = entrega;
+
+            return View(clase);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EnviarClase(
+    int claseId,
+    string? texto,
+    IFormFile? imagen)
+        {
+            if (HttpContext.Session.GetString("UsuarioTipo") != "Estudiante")
+                return RedirectToAction("EstudianteLogin", "Auth");
+
+            var cedula = HttpContext.Session.GetString("UsuarioCedula");
+
+            var clase = await _context.Clases.FindAsync(claseId);
+
+            if (clase == null)
+                return NotFound();
+
+            // Validaciones dinámicas
+            if (clase.RequiereTexto && string.IsNullOrWhiteSpace(texto))
+            {
+                TempData["Error"] = "Debes escribir una respuesta.";
+                return RedirectToAction("VerClase", new { claseId });
+            }
+
+            if (clase.RequiereImagen && (imagen == null || imagen.Length == 0))
+            {
+                TempData["Error"] = "Debes subir una imagen.";
+                return RedirectToAction("VerClase", new { claseId });
+            }
+
+            var entrega = _context.EntregasClases
+                .FirstOrDefault(e =>
+                    e.ClaseId == claseId &&
+                    e.EstudianteCedula == cedula);
+
+            if (entrega == null)
+            {
+                entrega = new EntregaClase
+                {
+                    ClaseId = claseId,
+                    EstudianteCedula = cedula
+                };
+
+                _context.EntregasClases.Add(entrega);
+            }
+
+            entrega.Texto = texto;
+            entrega.FechaEntrega = DateTime.Now;
+
+            // Guardar imagen
+            if (imagen != null && imagen.Length > 0)
+            {
+                var ext = Path.GetExtension(imagen.FileName).ToLower();
+
+                if (ext != ".jpg" && ext != ".jpeg" && ext != ".png")
+                {
+                    TempData["Error"] = "Solo imágenes JPG o PNG.";
+                    return RedirectToAction("VerClase", new { claseId });
+                }
+
+                var carpeta = Path.Combine(
+                    _environment.WebRootPath,
+                    "entregas",
+                    "clases");
+
+                if (!Directory.Exists(carpeta))
+                    Directory.CreateDirectory(carpeta);
+
+                var nombre = Guid.NewGuid() + ext;
+                var ruta = Path.Combine(carpeta, nombre);
+
+                using (var stream = new FileStream(ruta, FileMode.Create))
+                {
+                    await imagen.CopyToAsync(stream);
+                }
+
+                entrega.ImagenPath = "/entregas/clases/" + nombre;
+            }
+
+            await _context.SaveChangesAsync();
+
+            TempData["Mensaje"] = "Entrega guardada correctamente.";
+
+            return RedirectToAction("VerClase", new { claseId });
         }
     }
 }

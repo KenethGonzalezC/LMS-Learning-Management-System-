@@ -170,11 +170,17 @@ namespace LMS.Data
             // ===============================
             // CLASE PARA CURSO
             // ===============================
-            modelBuilder.Entity<Clase>()
-                .HasOne(c => c.Curso)
-                .WithMany(cu => cu.Clases)
-                .HasForeignKey(c => c.CursoId)
+            modelBuilder.Entity<EntregaClase>()
+                .HasOne(e => e.Clase)
+                .WithMany()
+                .HasForeignKey(e => e.ClaseId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<EntregaClase>()
+                .HasOne(e => e.Estudiante)
+                .WithMany()
+                .HasForeignKey(e => e.EstudianteCedula)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
